@@ -31,6 +31,7 @@ export function SiteLayout() {
           <nav className={`main-nav${menuOpen ? ' main-nav--open' : ''}`} aria-label="Navigation principale">
             <NavLink onClick={closeMenu} to="/professionnels">Trouver un professionnel</NavLink>
             <NavLink onClick={closeMenu} to="/professionnels/inscription">Inscription professionnelle</NavLink>
+            <NavLink onClick={closeMenu} to="/professionnel/tableau-de-bord">Tableau de bord</NavLink>
             <a onClick={closeMenu} href="/#fonctionnement">Comment ça marche</a>
             <a onClick={closeMenu} href="/#ressources">Conseils & ressources</a>
             <Link className="button button--nav" onClick={closeMenu} to="/professionnels/inscription">

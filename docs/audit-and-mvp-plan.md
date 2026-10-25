@@ -105,21 +105,51 @@ Aucune de ces intégrations n'est actuellement configurée ou déclarée opérat
 - Utilisation de `images/la maison du droit.png`, seul visuel fourni sans texte incrusté, avec un dérivé JPEG à qualité 88 dans `public/images/hero-cabinet.jpg` (environ 197 Ko contre 1,94 Mo pour le PNG original). Le fichier original reste intact.
 - Ajout d'un `.env.example` sans secret, d'un `.gitignore`, du guide de démarrage et de cette documentation d'audit/passation.
 - Mise à jour de Vitest après détection d'avis de sécurité dans la première version résolue par npm; le nouvel audit complet ne signale aucune vulnérabilité.
+- Ajout de l'intégration Supabase côté client (`@supabase/supabase-js`) et d'un `.env.example` public sans secret. La connexion réelle reste désactivée tant que `.env.local` et le projet hébergé ne sont pas configurés.
+- Ajout de la migration versionnée `supabase/migrations/20261025000100_secure_lawyer_verification.sql` : profils relationnels, demandes de vérification, fonctions RPC contrôlées, journal d'audit, accès administrateur explicite et compartiments de stockage.
+- Les justificatifs d'avocat restent dans un compartiment privé; la photo l'est également avant validation. Les URL signées de photo ne sont créées que pour le propriétaire ou un profil vérifié.
+- Création de compte Supabase et soumission de candidature disponibles quand la configuration est présente; une confirmation d'adresse électronique peut être requise avant connexion et envoi du dossier.
+- Ajout d'un téléversement photo de profil, d'un aperçu local sans conservation, et d'un éditeur de présentation par sections (titre et texte; jusqu'à 12 sections).
+- Ajout du tableau de bord professionnel authentifié `/professionnel/tableau-de-bord`, permettant de modifier la photo, la ville, les catégories/spécialités et les sections de présentation. Toute modification d'un profil déjà vérifié suspend sa publication et ses consultations jusqu'à une nouvelle validation.
+- L'annuaire interroge la vue publique `published_professional_profiles`, qui filtre côté base les profils validés; la recherche applique aussi les catégories, la ville et la profession. Chaque résultat mène à une fiche publique avec sa photo signée et ses sections.
+- Ajout de fonctions RPC administratives pour lister les profils en attente, consulter la file de justificatifs des avocats et consigner une décision. L'UUID d'un administrateur doit être ajouté par le propriétaire de la base à `public.platform_admins`; aucun écran d'administration n'est encore livré.
 
 ### Validation observée
 
 - `npm run build` : réussi (vérification TypeScript et bundle Vite).
-- `npm test` : réussi, 6 fichiers et 16 tests.
+- `npm test` : 8 fichiers et 24 tests réussis après ajout des tests du tableau de bord non configuré, du lien de profil par spécialité et des sections publiques.
 - `npm run lint` : réussi.
 - `npm audit` : 0 vulnérabilité après la mise à jour de Vitest.
 - La route locale `/__dev/professionnels/maitre-noupa-rudi` est incluse uniquement en mode développement; aucune fiche ni son portrait ne sont ajoutés au catalogue ou aux assets publics de production.
 - La carte de maquette dans l'annuaire est elle aussi chargée uniquement en développement et reste clairement distincte du nombre de profils publiés/vérifiés.
 - Le contenu de présentation du brouillon n'est pas un conseil juridique publié ni une description vérifiée de services réellement fournis.
 - Smoke test navigateur : accueil chargé; navigation vers `/professionnels`; recherche « Droit du travail » passée dans `q`; message d'annuaire vide visible.
+- Vérification navigateur après changements : formulaire d'inscription, entrée photo, éditeur de présentation et lien de tableau de bord visibles; le dashboard explique honnêtement qu'une configuration Supabase est nécessaire pour l'authentification réelle.
 - Contrôle mobile navigateur à 390 px : largeur de contenu mesurée à 375 px, sans débordement horizontal.
 
 ### Non réalisé / sans migration
 
-- Aucune migration de base de données n'est créée : il n'existe pas encore de backend ni de modèle persistant configuré.
-- Aucun service externe (authentification, paiement, e-mail/SMS, stockage, analytics) n'est connecté.
-- Aucun déploiement n'a été effectué. La production requiert un backend, une politique de données et les revues métier/juridiques décrites dans les phases suivantes.
+- La migration Supabase existe mais n'a pas été appliquée à un projet; aucun projet ni identifiant Supabase n'a été fourni. L'intégration ne peut donc pas être considérée comme déployée ni testée contre un serveur réel.
+- La prévisualisation en mode développement reste locale et ne téléverse ni photo ni justificatifs.
+- L'écran d'administration des candidatures est à construire; les RPC et policies sont prévues, mais doivent être validées sur un projet jetable avec tests d'accès positifs et négatifs.
+- Aucun service de paiement, e-mail/SMS transactionnel supplémentaire, rendez-vous, documents clients ou fonctionnalité IA n'est connecté.
+- Aucun déploiement n'a été effectué. Avant production, appliquer la migration, vérifier les politiques de stockage/RLS et les parcours e-mail, effectuer une revue de sécurité et de confidentialité, puis compléter la modération et les écrans d'administration.
+
+## 8. Suite de travail — profil professionnel
+
+### Parcours livré côté code
+
+1. Le professionnel choisit « Créer un compte » ou « J’ai déjà un compte », entre une adresse électronique et un mot de passe, et complète son profil.
+2. Il choisit une photo facultative, au format JPG/PNG/WebP et limitée à 5 Mo.
+3. Il sélectionne une ou plusieurs catégories; sa présentation contient au moins une section, chacune avec un titre et un texte (limites de taille et de quantité contrôlées côté client et côté base).
+4. Un avocat ajoute les informations et cinq pièces justificatives, limitées à 10 Mo chacune; les autres professions n'envoient pas ces pièces.
+5. Le stockage et la fonction de soumission associent les éléments au compte authentifié. Une erreur de transmission est affichée et les fichiers temporaires sont supprimés lorsque le nettoyage est autorisé.
+6. Le statut initial est « en attente ». Le profil n'apparaît ni dans la vue publique, ni dans les résultats; il n'offre pas de consultations.
+7. Après vérification administrative, la recherche publique affiche le profil selon son nom, sa ville, sa profession et ses catégories. La page détail présente la photo et les sections, avec URL signée temporaire pour la photo.
+8. Le professionnel connecté modifie les données dans le tableau de bord. Les modifications sont validées par RPC qui vérifie le propriétaire côté serveur.
+
+### Configuration et validation avant utilisation réelle
+
+Suivre les étapes Supabase décrites dans [README.md](../README.md#configurer-supabase-environnement-de-test). Utiliser un projet de test, appliquer la migration et configurer une redirection d'authentification. Test de sécurité à effectuer : un compte ne doit pas pouvoir modifier un autre profil ou lire les pièces privées d'un autre candidat; un non-administrateur ne doit pas pouvoir consulter les files d'examen ou valider un profil.
+
+Le dashboard d'administration n'est pas encore dans l'interface. Les UUID des administrateurs doivent être contrôlés et ajoutés hors du parcours public. Le bucket photo est privé; les profils de la vue publique uniquement reçoivent des URL signées temporaires.

@@ -51,10 +51,11 @@ export function getRegionForCity(city: string): (typeof regions)[number] | undef
 export type Professional = {
   id: string
   name: string
-  profession: (typeof professions)[number]
-  city: (typeof cities)[number]
+  profession: string
+  city: string
   specialties: string[]
   verified: boolean
+  photoUrl?: string | null
 }
 
 // Public profiles remain empty until verified professionals are supplied by the backend.
@@ -86,7 +87,7 @@ export function filterProfessionals(
       professional.verified &&
       matchesQuery &&
       (!city || professional.city === city) &&
-      (!region || cityRegions[professional.city] === region) &&
+      (!region || getRegionForCity(professional.city) === region) &&
       (!profession || professional.profession === profession)
     )
   })

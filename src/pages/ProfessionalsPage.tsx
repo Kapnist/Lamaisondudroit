@@ -2,8 +2,10 @@ import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
 import { ArrowRight, BriefcaseBusiness, MapPin, Search, ShieldCheck, SlidersHorizontal, UsersRound } from 'lucide-react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { cities, filterProfessionals, professions, professionals, regions } from '../data/catalogue'
+import { cities, filterProfessionals, professions, regions } from '../data/catalogue'
 import { ProfessionalSearch } from '../components/ProfessionalSearch'
+import { getPublishedProfessionals } from '../services/professionalProfiles'
+import type { PublishedProfessional } from '../services/professionalProfiles'
 
 const DraftDirectoryPreview = import.meta.env.DEV
   ? lazy(() =>
@@ -27,6 +29,26 @@ export function ProfessionalsPage() {
   const [city, setCity] = useState(searchParams.get('ville') ?? '')
   const [profession, setProfession] = useState(searchParams.get('profession') ?? '')
   const [region, setRegion] = useState(searchParams.get('region') ?? '')
+  const [publishedProfiles, setPublishedProfiles] = useState<PublishedProfessional[]>([])
+  const [isLoadingProfiles, setIsLoadingProfiles] = useState(true)
+  const [profilesError, setProfilesError] = useState('')
+
+  useEffect(() => {
+    let active = true
+    void getPublishedProfessionals()
+      .then((profiles) => {
+        if (active) setPublishedProfiles(profiles)
+      })
+      .catch((error: unknown) => {
+        if (active) setProfilesError(error instanceof Error ? error.message : 'Impossible de charger les profils.')
+      })
+      .finally(() => {
+        if (active) setIsLoadingProfiles(false)
+      })
+    return () => {
+      active = false
+    }
+  }, [])
 
   useEffect(() => {
     setQuery(searchParams.get('q') ?? '')
@@ -36,8 +58,8 @@ export function ProfessionalsPage() {
   }, [searchParams])
 
   const results = useMemo(
-    () => filterProfessionals(professionals, query, city, profession, region),
-    [query, city, profession, region],
+    () => filterProfessionals(publishedProfiles, query, city, profession, region),
+    [publishedProfiles, query, city, profession, region],
   )
   const appliedQuery = searchParams.get('q') ?? ''
   const appliedCity = searchParams.get('ville') ?? ''
@@ -121,24 +143,30 @@ export function ProfessionalsPage() {
             {results.length === 0 ? (
               <div className="empty-state">
                 <div className="empty-state__icon"><UsersRound size={25} /></div>
-                <span className="eyebrow">Annuaire en cours de constitution</span>
-                <h3>Aucun profil publié pour le moment</h3>
-                <p>
-                  Les profils apparaîtront ici après vérification. Nous préférons attendre les premiers professionnels validés plutôt que d’afficher des profils fictifs.
-                </p>
+                {isLoadingProfiles
+                  ? <p role="status">Chargement des profils vérifiés…</p>
+                  : profilesError
+                    ? <p role="alert">{profilesError}</p>
+                    : <>
+                        <span className="eyebrow">Annuaire en cours de constitution</span>
+                        <h3>Aucun profil publié pour le moment</h3>
+                        <p>Les profils correspondant à vos critères apparaîtront après validation. Aucun profil fictif n’est affiché.</p>
+                      </>}
                 {(query || city || profession || region) && <button className="text-link" type="button" onClick={clearFilters}>Effacer la recherche <ArrowRight size={15} /></button>}
               </div>
             ) : (
               <div className="professional-list">
                 {results.map((professional) => (
                   <article className="professional-card" key={professional.id}>
-                    <div className="professional-card__avatar"><BriefcaseBusiness size={24} /></div>
+                    {professional.photoUrl
+                      ? <img className="professional-card__avatar professional-card__avatar--photo" src={professional.photoUrl} alt="" />
+                      : <div className="professional-card__avatar"><BriefcaseBusiness size={24} /></div>}
                     <div className="professional-card__details">
                       <div className="professional-card__name">{professional.name} <span><ShieldCheck size={14} /> Vérifié</span></div>
                       <p>{professional.profession} · {professional.city}</p>
                       <div className="professional-card__specialties">{professional.specialties.join(' · ')}</div>
                     </div>
-                    <button className="button button--outline" type="button" disabled>Profil indisponible</button>
+                    <Link className="button button--outline" to={`/professionnels/${professional.id}`}>Voir le profil <ArrowRight size={14} /></Link>
                   </article>
                 ))}
               </div>

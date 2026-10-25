@@ -37,6 +37,11 @@ npm run lint
 - Navigation publique, menu mobile et liens vers les principales sections.
 - Recherche par mot-clé, ville et profession conduisant à l'annuaire.
 - Filtres d'annuaire par profession et ville, synchronisés avec les paramètres de l'URL.
+- Recherche des profils vérifiés par nom, ville, profession et spécialités enregistrées.
+- Pages de profils publics avec photo, spécialités, présentation en sections et partage du lien.
+- Inscription professionnelle avec téléversement de photo et saisie de sections « titre + texte ».
+- Tableau de bord professionnel authentifié pour modifier la photo, la ville, les spécialités et les sections de présentation; toute modification d'un profil vérifié suspend sa publication jusqu'à une nouvelle validation.
+- Migration Supabase avec profils, validation, journaux d'audit, justificatifs privés, avatars privés et contrôles d'accès.
 - Catégories initiales issues du cahier des charges.
 - Villes proposées dans les filtres : Douala, Yaoundé, Bafoussam, Garoua, Bangangté et Bamena.
 - États vides explicites : aucun faux professionnel ou contenu juridique présenté comme authentique.
@@ -45,9 +50,9 @@ npm run lint
 - Visuel de bannière optimisé en JPEG (environ 197 Ko) à partir du PNG fourni, dont l'original reste conservé.
 - Fiche locale de démonstration pour Maître Noupa Rudi, non publiée et non vérifiée, avec texte de présentation proposé, accessible uniquement avec le serveur de développement à `/__dev/professionnels/maitre-noupa-rudi`.
 - Formulaire de préparation à l’inscription professionnelle avec sélection d’une ou plusieurs catégories juridiques.
-- Pour les candidatures d’avocat, maquette du formulaire avec statut titulaire/stagiaire, matricule, ordre, ville de prestation de serment, cabinet de stage et justificatifs requis. Les fichiers ne sont ni téléversés ni stockés : ne pas utiliser de vrais documents avant la mise en place d'un backend sécurisé.
+- Pour les candidatures d’avocat, champs statut titulaire/stagiaire, matricule, ordre, ville de prestation de serment, cabinet de stage et cinq justificatifs requis. Lorsque Supabase est configuré, les pièces sont téléversées dans un bucket privé et le profil reste en attente de validation.
 - Les candidatures restent non vérifiées et ne peuvent pas proposer de consultations. Le badge « Vérifié » est réservé aux profils dont la validation est réellement enregistrée; le profil de démonstration Maître Noupa affiche « Vérification à confirmer ».
-- En mode développement, les candidatures de démonstration sont conservées dans le navigateur et apparaissent dans l’annuaire en tant que profils en attente de vérification. Elles sont partagées entre les onglets de ce navigateur, mais pas avec d’autres appareils ou utilisateurs et sont exclues de la production.
+- Sans configuration Supabase, le formulaire reste une prévisualisation de développement en navigateur; les photos et pièces ne sont alors pas envoyées ni conservées.
 - L’annuaire présente les dix régions du Cameroun comme filtres. Le formulaire de candidature associe la région aux villes connues : Bangangté, Bamena et Bafoussam (Ouest), Douala (Littoral), Yaoundé (Centre) et Garoua (Nord).
 - Menu de partage sur la fiche de profil avec options WhatsApp, Facebook, Instagram (copie du lien puis ouverture) et copie directe.
 
@@ -74,36 +79,48 @@ docs/
 - `/` affiche l'accueil. Les ancres `#domaines`, `#fonctionnement`, `#professionnels` et `#ressources` ciblent les sections publiques.
 - `/professionnels` affiche la recherche. Les paramètres `q`, `ville` et `profession` préremplissent les filtres.
 - `src/data/catalogue.ts` centralise les catégories, villes, professions et fonction `filterProfessionals`.
-- `professionals` est volontairement vide tant qu'aucune source serveur ne fournit de profils vérifiés. Brancher le backend à cette frontière plutôt que d'ajouter des profils fictifs.
+- `src/services/professionalProfiles.ts` lit la vue Supabase `published_professional_profiles`; seuls les profils validés sont renvoyés et filtrés selon leurs spécialités. Sans Supabase, l'annuaire reste volontairement vide de profils publics.
 - La fiche de démonstration est séparée du catalogue dans `src/data/draftProfiles.ts`; sa route existe uniquement quand `import.meta.env.DEV` est vrai. Son portrait reste sous `src/assets/` et est retiré du build de production avec cette route. Elle ne doit pas être utilisée comme preuve d'identité ni publiée sans consentement sur l'image et validation des justificatifs.
-- Le formulaire `/professionnels/inscription` permet de préparer une candidature avec plusieurs catégories. En développement seulement, les entrées sont conservées en `localStorage` pour que l'annuaire les affiche depuis les autres onglets du même navigateur, avec leur statut « en attente ». Ce n'est ni une inscription serveur ni un stockage adapté à de vraies données.
-- Le formulaire demande cinq justificatifs distincts aux avocats. La démonstration vérifie qu'ils ont été sélectionnés mais les données personnelles et les fichiers ne sont pas envoyés ni stockés. Ne jamais traiter une prévisualisation locale comme une soumission effective ou une validation.
+- Le formulaire `/professionnels/inscription` permet de créer un compte ou de se connecter, de téléverser une photo, de choisir plusieurs catégories et d'ajouter jusqu'à 12 sections de présentation. Avec Supabase, les profils sont enregistrés en attente de vérification.
+- Le formulaire d'avocat exige cinq pièces justificatives. Elles sont envoyées vers le bucket privé `lawyer-verification`, accessible uniquement au propriétaire et aux administrateurs configurés.
+- La photo est conservée dans le bucket privé `professional-avatars`; des URLs signées temporaires ne sont rendues accessibles au public qu'après vérification du profil.
+- `/professionnel/tableau-de-bord` permet au professionnel authentifié de modifier sa photo, sa ville, ses catégories et les titres/textes de présentation.
+- En développement sans Supabase, les entrées de démonstration sont conservées dans `localStorage`, uniquement sur le même navigateur. Ce mode ne transmet aucun fichier et n'est pas une inscription serveur.
 - `ShareProfileButton` ouvre des options explicites : WhatsApp et Facebook préremplissent le partage; Instagram ne proposant pas de lien web standard pour partager une page, l'option copie l'URL puis ouvre Instagram; la copie directe reste disponible. Les liens des brouillons locaux ne sont pas accessibles au public; le bouton le signale.
 - En mode développement, une recherche correspondant à « famille », « Noupa » ou « Rudi » affiche une carte de prévisualisation clairement séparée des profils publiés; elle renvoie vers la fiche de démonstration. Cette carte et ses données sont absentes de production.
 - Le texte de présentation du brouillon est lui aussi à valider avant publication, notamment les descriptions de démarches juridiques et de protection. Il est formulé sans garantir un résultat ou une mesure spécifique.
-- Les contrôles de recherche sont réels côté interface, mais ne déclenchent actuellement aucun appel API.
+- Les contrôles de recherche interrogent Supabase lorsque l'environnement est configuré; la vue publique renvoie exclusivement des profils approuvés.
 
 ## Décisions techniques
 
-- **Vite plutôt que Next.js** : le dépôt est vierge et la demande de développement cible explicitement React/TypeScript/Vite/Tailwind. Cette décision ne fournit pas de backend : il faudra choisir et documenter une API avant l'authentification et les données réelles.
+- **Supabase** : utilisé pour l'authentification, PostgreSQL, les fonctions RPC contrôlées et le stockage des photos/pièces. La migration SQL versionnée définit les limites de sécurité et les règles de publication.
 - **React Router** : permet des URLs publiques distinctes sans coupler l'interface au stockage.
 - **CSS de composants et tokens de marque** : le système visuel est défini dans `src/index.css`; Tailwind v4 est installé et configuré pour permettre les utilitaires au fur et à mesure. Les styles personnalisés maintiennent ici le contrôle du rendu et du responsive.
-- **Pas de fournisseur externe ni de secret** : `.env.example` est un emplacement de référence, pas la preuve d'une intégration.
+- **Configuration requise** : les variables publiques `VITE_SUPABASE_URL` et `VITE_SUPABASE_ANON_KEY` doivent être configurées dans `.env.local`. Aucune clé `service_role` ne doit être exposée côté navigateur.
 - **Aucun profil ni article de démonstration** : exigence de fiabilité; le contenu public doit provenir de données réelles et validées.
 
 ## Sécurité et limites à respecter
 
-Cette livraison est un frontend de démarrage, **pas un SaaS prêt pour la production**. Elle ne fournit pas :
+Cette livraison fournit une intégration Supabase initiale, mais **n'est pas prête pour une production ouverte**. Elle ne fournit pas :
 
-- un backend, une base de données ou des migrations;
-- l'authentification, les sessions et les permissions serveur;
-- la soumission ou la vérification des profils;
+- un projet Supabase hébergé déjà configuré ni des identifiants;
+- une interface d'administration pour valider les candidatures (les RPC d'administration sont réservées aux UUID ajoutés explicitement à `platform_admins`);
 - les articles publiés ou la bibliothèque juridique;
 - les services, créneaux, réservations ou la protection contre les doubles réservations;
 - un paiement, des reçus, des remboursements ou des notifications;
-- le stockage privé, les dossiers, l'administration et les journaux d'audit.
+- les dossiers clients et la gestion documentaire.
 
-Ne pas collecter de données personnelles réelles, publier des pièces confidentielles, promettre un créneau ou annoncer un paiement actif depuis cette version. Un contrôle visuel React ne remplace jamais une autorisation serveur.
+Les migrations et politiques ne sont effectives qu'après application à un projet Supabase de test et vérification des rôles. Ne collecter aucun document réel avant cette étape et une revue de sécurité indépendante.
+
+### Configurer Supabase (environnement de test)
+
+1. Créer un projet Supabase non-production et définir les URL autorisées de redirection d'authentification.
+2. Copier `.env.example` vers `.env.local`, puis renseigner `VITE_SUPABASE_URL` et la clé publique anon/publishable du projet. Ne jamais mettre la clé `service_role` dans une variable `VITE_`.
+3. Appliquer `supabase/migrations/20261025000100_secure_lawyer_verification.sql` avec la Supabase CLI liée au projet de test (`supabase db push`) ou l'éditeur SQL.
+4. Ajouter manuellement l'identifiant UUID du compte administrateur prévu à `public.platform_admins` depuis un contexte propriétaire de base de données. Ne pas fournir de fonction permettant aux utilisateurs de s'auto-attribuer ce rôle.
+5. Les candidats confirment leur courriel si la confirmation Supabase est activée, puis se connectent depuis `/professionnel/tableau-de-bord` ou reviennent à l'inscription pour envoyer leur dossier.
+6. Les profils restent non publiés jusqu'à une décision administrative. Les profils publics sont consultés par catégories via la vue `published_professional_profiles`; les photos restent privées et sont servies avec des URL signées temporaires.
+7. Tester les politiques RLS, les refus d'accès aux documents par un autre compte, le refus d'approbation par un non-admin, l'expiration des URL signées et le parcours e-mail en projet de test avant d'utiliser des données réelles.
 
 ## Consignes pour l'équipe de relais
 
@@ -118,4 +135,4 @@ Ne pas collecter de données personnelles réelles, publier des pièces confiden
 
 ## Prochaine étape recommandée
 
-Après validation du présent plan, sélectionner l'architecture serveur et livrer les fondations de données et d'authentification avant d'activer l'inscription professionnelle. Les jalons complets et leurs critères d'acceptation figurent dans [docs/audit-and-mvp-plan.md](./docs/audit-and-mvp-plan.md).
+Appliquer et tester la migration Supabase dans un projet non-production, puis compléter l'interface de modération administrative et les tests d'accès négatifs avant d'utiliser des pièces réelles. Les jalons MVP et les limites figurent dans [docs/audit-and-mvp-plan.md](./docs/audit-and-mvp-plan.md).

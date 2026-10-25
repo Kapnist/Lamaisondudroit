@@ -1,6 +1,6 @@
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-import { beforeEach, describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { DevelopmentRegistrations } from '../components/DevelopmentRegistrations'
 import {
   clearDevelopmentRegistrations,
@@ -8,26 +8,29 @@ import {
   saveDevelopmentRegistration,
 } from '../data/developmentRegistrations'
 import { ProfessionalsPage } from './ProfessionalsPage'
+import * as professionalProfiles from '../services/professionalProfiles'
 
 describe('ProfessionalsPage', () => {
   beforeEach(() => {
     clearDevelopmentRegistrations()
   })
 
-  it('shows the search state transparently when no verified profiles are available', () => {
+  it('shows the search state transparently when no verified profiles are available', async () => {
+    vi.spyOn(professionalProfiles, 'getPublishedProfessionals').mockResolvedValueOnce([])
     render(
       <MemoryRouter initialEntries={['/professionnels?q=droit&ville=Douala']}>
         <ProfessionalsPage />
       </MemoryRouter>,
     )
 
-    expect(screen.getByRole('heading', { name: /aucun profil publié pour le moment/i })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: /aucun profil publié pour le moment/i })).toBeInTheDocument()
     expect(screen.getByLabelText('Nom ou spécialité')).toHaveValue('droit')
     expect(within(screen.getByRole('complementary')).getByLabelText('Ville')).toHaveValue('Douala')
     expect(screen.queryByRole('link', { name: /profil/i })).not.toBeInTheDocument()
   })
 
   it('shows the family-law draft preview for the matching search in development', async () => {
+    vi.spyOn(professionalProfiles, 'getPublishedProfessionals').mockResolvedValueOnce([])
     render(
       <MemoryRouter initialEntries={['/professionnels?q=Droit%20de%20la%20famille']}>
         <ProfessionalsPage />
@@ -43,6 +46,7 @@ describe('ProfessionalsPage', () => {
   })
 
   it('does not show the draft preview for a city-filtered search', async () => {
+    vi.spyOn(professionalProfiles, 'getPublishedProfessionals').mockResolvedValueOnce([])
     render(
       <MemoryRouter initialEntries={['/professionnels?q=famille&ville=Douala']}>
         <ProfessionalsPage />
@@ -55,6 +59,7 @@ describe('ProfessionalsPage', () => {
   })
 
   it('lists all local registrations with a pending verification status', async () => {
+    vi.spyOn(professionalProfiles, 'getPublishedProfessionals').mockResolvedValueOnce([])
     saveDevelopmentRegistration({
       name: 'Maître Essai',
       profession: 'Avocat',
@@ -86,6 +91,7 @@ describe('ProfessionalsPage', () => {
   })
 
   it('filters registered profiles by region', async () => {
+    vi.spyOn(professionalProfiles, 'getPublishedProfessionals').mockResolvedValueOnce([])
     saveDevelopmentRegistration({
       name: 'Avocate Ouest',
       profession: 'Avocat',
@@ -129,5 +135,31 @@ describe('ProfessionalsPage', () => {
     fireEvent(window, new StorageEvent('storage', { key: developmentRegistrationsStorageKey }))
 
     expect(await screen.findByText('Profil ajouté ailleurs')).toBeInTheDocument()
+  })
+
+  it('shows verified professionals for a matching specialty and links to their public profile', async () => {
+    vi.spyOn(professionalProfiles, 'getPublishedProfessionals').mockResolvedValueOnce([
+      {
+        id: 'profile-family-001',
+        name: 'Me Test Vérifié',
+        profession: 'Avocat',
+        city: 'Douala',
+        specialties: ['Droit de la famille'],
+        verified: true,
+        photoUrl: null,
+        presentationSections: [{ title: 'Notre approche', text: 'Accompagnement.' }],
+      },
+    ])
+    render(
+      <MemoryRouter initialEntries={['/professionnels?q=Droit%20de%20la%20famille']}>
+        <ProfessionalsPage />
+      </MemoryRouter>,
+    )
+
+    expect(await screen.findByText('Me Test Vérifié')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /voir le profil/i })).toHaveAttribute(
+      'href',
+      '/professionnels/profile-family-001',
+    )
   })
 })
