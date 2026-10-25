@@ -2,6 +2,7 @@ import { ArrowLeft, Clock3, MapPin, ShieldAlert } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { noupaRudiDraft } from '../data/draftProfiles'
 import { ShareProfileButton } from '../components/ShareProfileButton'
+import { DemoBooking } from '../components/DemoBooking'
 
 export function DraftProfessionalPage() {
   const consultation = noupaRudiDraft.firstConsultation
@@ -18,7 +19,7 @@ export function DraftProfessionalPage() {
           <ShieldAlert size={20} />
           <div>
             <strong>Profil fictif de démonstration — ne représente pas un professionnel réel</strong>
-            <p>Cette fiche est un exemple d’interface. L’identité, les justificatifs et les informations professionnelles ne sont pas vérifiés. Aucune consultation ne peut être réservée.</p>
+            <p>Cette fiche est un exemple d’interface. L’identité, les justificatifs et les informations professionnelles ne sont pas vérifiés. Le parcours de réservation ci-dessous est une simulation sans transaction réelle.</p>
           </div>
         </div>
 
@@ -47,13 +48,15 @@ export function DraftProfessionalPage() {
                 <span><Clock3 size={16} /> {consultation.durationMinutes} minutes</span>
                 <strong>{consultation.priceXaf.toLocaleString('fr-FR')} FCFA</strong>
               </div>
-              <button className="button button--nav" type="button" disabled>
-                Réservation indisponible
-              </button>
-              <p>La réservation sera activée après mise en place du service et validation du profil.</p>
+              <a className="button button--nav" href="#reservation-demo">
+                Essayer la réservation démo
+              </a>
+              <p>Le tarif et le service sont fictifs; aucun rendez-vous réel n’est créé.</p>
             </div>
           </div>
         </article>
+
+        <DemoBooking />
 
         <section className="draft-presentation" aria-labelledby="draft-presentation-title">
           <div className="draft-presentation__intro">

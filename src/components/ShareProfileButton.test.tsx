@@ -31,9 +31,9 @@ describe('ShareProfileButton', () => {
     expect(navigator.clipboard.writeText).toHaveBeenCalledWith(window.location.href)
   })
 
-  it('warns that a development draft link is local only', () => {
+  it('warns that the public demo profile is not a real professional', () => {
     render(<ShareProfileButton name="Maître Test" description="Avocat" isDraft />)
 
-    expect(screen.getByText(/adresse de prévisualisation est locale/i)).toBeInTheDocument()
+    expect(screen.getByText(/cette fiche de démonstration est publique, mais ne représente pas un professionnel réel/i)).toBeInTheDocument()
   })
 })
