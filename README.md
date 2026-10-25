@@ -60,6 +60,7 @@ GitHub Pages héberge uniquement les fichiers statiques du frontend. L’authent
 - États vides explicites : aucun faux professionnel ou contenu juridique présenté comme authentique.
 - Filtrage des profils limité aux profils vérifiés dans le module de catalogue.
 - Page 404, balises de description, navigation clavier, libellés de champs et respect de la préférence « réduire les animations ».
+- Typographie responsive renforcée : boutons à 14 px minimum et textes secondaires à 12 px minimum, y compris sur mobile.
 - Visuel de bannière optimisé en JPEG (environ 197 Ko) à partir du PNG fourni, dont l'original reste conservé.
 - Fiche fictive de démonstration pour Maître Noupa Rudi, affichée séparément des profils vérifiés dans l’annuaire public et accessible à `/professionnels/demo/maitre-noupa-rudi`. Son statut fictif est explicite et la réservation est désactivée.
 - Formulaire de préparation à l’inscription professionnelle avec sélection d’une ou plusieurs catégories juridiques.

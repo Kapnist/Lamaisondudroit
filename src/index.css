@@ -522,3 +522,124 @@ h1 em, h2 em { color: var(--gold-light); font-weight: 500; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
 }
+
+/* Keep supporting copy and controls readable across desktop and mobile layouts. */
+.button,
+.text-link,
+.search-submit,
+.filter-submit,
+.clear-filters,
+.signup-preview__link,
+.account-mode button,
+.presentation-add,
+.presentation-remove,
+.share-profile__button,
+.share-profile__menu > a,
+.share-profile__menu > button,
+.hero__actions .button,
+.hero__actions .text-link,
+.main-nav .button,
+.professional-card .button,
+.draft-directory-card > .button {
+  font-size: 14px;
+}
+
+.search-heading .eyebrow,
+.empty-state .eyebrow,
+.footer-note .eyebrow {
+  font-size: 12px;
+}
+
+.search-field input,
+.search-field select,
+.filter-input,
+.filter-select,
+.signup-field input,
+.signup-field select,
+.signup-field textarea,
+.share-profile__fallback input {
+  font-size: 14px;
+}
+
+.announcement,
+.brand__tagline,
+.main-nav,
+.hero-kicker,
+.eyebrow,
+.hero__trust,
+.search-note,
+.benefit-strip__inner > div,
+.popular-professional-card__verified,
+.popular-professional-card__draft,
+.popular-professional-card__specialties span,
+.popular-professionals__empty,
+.popular-professionals__error,
+.categories-footer p,
+.callout-status,
+.callout-panel__seal,
+.resource-status,
+.footer-brand p,
+.site-footer h2,
+.footer-grid > div > a:not(.brand),
+.footer-note p,
+.footer-bottom,
+.breadcrumbs,
+.directory-hero > .container > p,
+.filter-label,
+.results-heading .eyebrow,
+.results-count,
+.professional-card__name,
+.professional-card__name > span,
+.professional-card__details p,
+.professional-card__specialties,
+.directory-disclaimer,
+.draft-directory-preview__heading h3,
+.draft-directory-preview__heading p,
+.draft-directory-card__details > strong,
+.draft-directory-card__details > span,
+.draft-directory-card__price,
+.draft-directory-card__price > strong,
+.signup-heading > p,
+.signup-notice p,
+.signup-form__intro p,
+.signup-field,
+.signup-field small,
+.signup-category-group legend,
+.signup-category-intro,
+.signup-category-option,
+.signup-category-error,
+.signup-submit-error,
+.signup-preview p,
+.signup-preview strong,
+.signup-preview__categories li,
+.signup-preview__presentation p,
+.signup-submit-success,
+.dashboard-heading p,
+.verification-banner strong,
+.verification-banner p,
+.published-profile__verified,
+.published-profile__specialties span,
+.signup-footnote,
+.development-registrations__heading h3,
+.development-registrations__heading p,
+.development-registration-card__details > strong,
+.development-registration-card__details > span,
+.development-registration-card__status,
+.draft-back,
+.draft-warning strong,
+.draft-warning p,
+.draft-profile__portrait p,
+.draft-profile__location,
+.share-profile__status,
+.share-profile__notice,
+.share-profile__hint,
+.consultation-card__details span,
+.consultation-card > p,
+.draft-footnote {
+  font-size: 12px;
+}
+
+@media (max-width: 620px) {
+  .benefit-strip__inner > div { min-height: 58px; line-height: 1.4; }
+  .announcement { min-height: 36px; }
+}
