@@ -2,6 +2,7 @@ export type DevelopmentRegistration = {
   id: string
   name: string
   profession: string
+  lawyerStatus?: 'Titulaire' | 'Stagiaire'
   city: string
   categories: string[]
   reviewStatus: 'pending_verification'
@@ -57,6 +58,7 @@ export function getDevelopmentRegistrations(): DevelopmentRegistration[] {
         typeof item.name === 'string' &&
         'profession' in item &&
         typeof item.profession === 'string' &&
+        (!('lawyerStatus' in item) || item.lawyerStatus === 'Titulaire' || item.lawyerStatus === 'Stagiaire') &&
         'city' in item &&
         typeof item.city === 'string' &&
         'categories' in item &&

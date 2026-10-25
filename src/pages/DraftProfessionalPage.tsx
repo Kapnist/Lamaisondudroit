@@ -17,8 +17,8 @@ export function DraftProfessionalPage() {
         <div className="draft-warning" role="status">
           <ShieldAlert size={20} />
           <div>
-            <strong>Brouillon de démonstration — non publié et non vérifié</strong>
-            <p>Cette fiche est visible uniquement en développement. Elle ne figure pas dans l’annuaire public.</p>
+            <strong>Maquette — profil non vérifié</strong>
+            <p>Cette fiche est visible uniquement en développement. Les justificatifs n’ont pas été contrôlés et le profil ne peut pas proposer de consultations.</p>
           </div>
         </div>
 
@@ -28,7 +28,7 @@ export function DraftProfessionalPage() {
             <p>{noupaRudiDraft.imageNotice}</p>
           </div>
           <div className="draft-profile__content">
-            <span className="eyebrow"><span className="eyebrow-line" /> Profil en attente de vérification</span>
+            <span className="eyebrow"><span className="eyebrow-line" /> Vérification à confirmer</span>
             <h1>{noupaRudiDraft.name}</h1>
             <p className="draft-profile__profession">{noupaRudiDraft.profession} · {noupaRudiDraft.specialty}</p>
             <div className="draft-profile__location">

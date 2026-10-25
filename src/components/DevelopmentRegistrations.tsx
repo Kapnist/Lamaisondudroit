@@ -75,11 +75,11 @@ export function DevelopmentRegistrations({
             </div>
             <div className="development-registration-card__details">
               <strong>{registration.name}</strong>
-              <span>{registration.profession} · {registration.city}{getRegionForCity(registration.city) ? `, région ${getRegionForCity(registration.city)}` : ''}</span>
+              <span>{registration.profession}{registration.lawyerStatus ? ` ${registration.lawyerStatus.toLocaleLowerCase('fr')}` : ''} · {registration.city}{getRegionForCity(registration.city) ? `, région ${getRegionForCity(registration.city)}` : ''}</span>
               <span>{registration.categories.join(' · ')}</span>
             </div>
             <div className="development-registration-card__status">
-              <Clock3 size={14} /> En attente de vérification
+              <Clock3 size={14} /> Profil non vérifié
             </div>
           </article>
         ))}

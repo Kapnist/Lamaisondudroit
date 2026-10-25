@@ -34,7 +34,7 @@ describe('ProfessionalsPage', () => {
       </MemoryRouter>,
     )
 
-    expect(await screen.findByRole('heading', { name: /aperçu de développement — non publié/i })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: /aperçu de développement — vérification à confirmer/i })).toBeInTheDocument()
     expect(screen.getByText('Maître Noupa Rudi')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Voir la maquette' })).toHaveAttribute(
       'href',
@@ -58,6 +58,7 @@ describe('ProfessionalsPage', () => {
     saveDevelopmentRegistration({
       name: 'Maître Essai',
       profession: 'Avocat',
+      lawyerStatus: 'Stagiaire',
       city: 'Bamena',
       categories: ['Droit de la famille', 'Droit du travail'],
     })
@@ -76,8 +77,10 @@ describe('ProfessionalsPage', () => {
 
     expect(await screen.findByRole('heading', { name: /profils inscrits — prévisualisation locale/i })).toBeInTheDocument()
     expect(screen.getByText('Maître Essai')).toBeInTheDocument()
+    expect(screen.getByText(/Avocat stagiaire · Bamena/)).toBeInTheDocument()
     expect(screen.getByText('Me Test')).toBeInTheDocument()
-    expect(screen.getAllByText('En attente de vérification')).toHaveLength(2)
+    expect(screen.getAllByText('Profil non vérifié')).toHaveLength(2)
+    expect(screen.getByText(/Avocat stagiaire · Bamena/)).toBeInTheDocument()
     expect(screen.getByText(/Bamena, région Ouest/)).toBeInTheDocument()
     expect(screen.getByText(/Bangangté, région Ouest/)).toBeInTheDocument()
   })

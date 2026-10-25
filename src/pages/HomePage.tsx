@@ -150,7 +150,7 @@ export function HomePage() {
               Préparer mon inscription <ArrowRight size={16} />
             </Link>
           </div>
-          <div className="callout-panel__seal"><Sparkles size={19} /><span>Une présence<br />professionnelle</span></div>
+          <div className="callout-panel__seal"><Sparkles size={19} /><span>Votre expertise,<br />mise en valeur</span></div>
         </div>
       </section>
 

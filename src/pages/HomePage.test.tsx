@@ -5,7 +5,7 @@ import { HomePage } from './HomePage'
 
 describe('HomePage', () => {
   it('provides a working path to the directory without presenting fictional professionals', () => {
-    render(
+    const { container } = render(
       <MemoryRouter>
         <HomePage />
       </MemoryRouter>,
@@ -14,6 +14,9 @@ describe('HomePage', () => {
     expect(screen.getByRole('heading', { name: /vos droits méritent les bons alliés/i })).toBeInTheDocument()
     expect(screen.getAllByRole('link', { name: /trouver un professionnel/i }).length).toBeGreaterThan(0)
     expect(screen.getByRole('link', { name: /explorer l’annuaire/i })).toHaveAttribute('href', '/professionnels')
+    expect(container.querySelector('.callout-panel__seal')?.textContent).toContain('Votre expertise,')
+    expect(container.querySelector('.callout-panel__seal')?.textContent).toContain('mise en valeur')
+    expect(screen.queryByText(/une présence professionnelle/i)).not.toBeInTheDocument()
     expect(screen.queryByText('Me Amina Exemple')).not.toBeInTheDocument()
   })
 })
