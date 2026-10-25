@@ -71,7 +71,7 @@ export function ProfessionalsPage() {
     !appliedCity &&
     !appliedRegion &&
     (!appliedProfession || appliedProfession === 'Avocat') &&
-    /famille|noupa|rudi/i.test(appliedQuery)
+    (!appliedQuery || /famille|noupa|rudi/i.test(appliedQuery))
   const hasDevelopmentRegistrations = Boolean(DevelopmentRegistrations && import.meta.env.DEV)
 
   function applyFilters(event: FormEvent<HTMLFormElement>) {
@@ -150,7 +150,7 @@ export function ProfessionalsPage() {
                     : <>
                         <span className="eyebrow">Annuaire en cours de constitution</span>
                         <h3>Aucun profil publié pour le moment</h3>
-                        <p>Les profils correspondant à vos critères apparaîtront après validation. Aucun profil fictif n’est affiché.</p>
+                        <p>Les profils correspondant à vos critères apparaîtront après validation. Les maquettes de développement sont présentées séparément et signalées comme non vérifiées.</p>
                       </>}
                 {(query || city || profession || region) && <button className="text-link" type="button" onClick={clearFilters}>Effacer la recherche <ArrowRight size={15} /></button>}
               </div>

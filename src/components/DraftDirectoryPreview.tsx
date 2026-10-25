@@ -15,7 +15,7 @@ export function DraftDirectoryPreview() {
         </div>
       </div>
       <article className="draft-directory-card">
-        <img src={noupaRudiDraft.profileImage} alt="" />
+        <img src={noupaRudiDraft.profileImage} alt="Photo de la maquette du profil de Maître Noupa Rudi" />
         <div className="draft-directory-card__details">
           <strong>{noupaRudiDraft.name}</strong>
           <span>{noupaRudiDraft.profession} · {noupaRudiDraft.specialty}</span>
@@ -26,7 +26,7 @@ export function DraftDirectoryPreview() {
           <strong>{consultation.priceXaf.toLocaleString('fr-FR')} FCFA</strong>
         </div>
         <Link className="button button--outline" to="/__dev/professionnels/maitre-noupa-rudi">
-          Voir la maquette
+          Voir le profil
         </Link>
       </article>
     </section>

@@ -39,7 +39,26 @@ describe('ProfessionalsPage', () => {
 
     expect(await screen.findByRole('heading', { name: /aperçu de développement — vérification à confirmer/i })).toBeInTheDocument()
     expect(screen.getByText('Maître Noupa Rudi')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Voir la maquette' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'Voir le profil' })).toHaveAttribute(
+      'href',
+      '/__dev/professionnels/maitre-noupa-rudi',
+    )
+    expect(screen.getByRole('img', { name: /maquette du profil de maître noupa rudi/i })).toBeInTheDocument()
+  })
+
+  it('shows the clearly unverified Maître Rudi example on an unfiltered directory visit in development', async () => {
+    vi.spyOn(professionalProfiles, 'getPublishedProfessionals').mockResolvedValueOnce([])
+    render(
+      <MemoryRouter initialEntries={['/professionnels']}>
+        <ProfessionalsPage />
+      </MemoryRouter>,
+    )
+
+    expect(await screen.findByRole('heading', { name: /aperçu de développement — vérification à confirmer/i })).toBeInTheDocument()
+    expect(screen.getByText('Maître Noupa Rudi')).toBeInTheDocument()
+    expect(screen.getByText('Avocat · Droit de la famille')).toBeInTheDocument()
+    expect(screen.getByText('Vérification à confirmer')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Voir le profil' })).toHaveAttribute(
       'href',
       '/__dev/professionnels/maitre-noupa-rudi',
     )
@@ -156,8 +175,10 @@ describe('ProfessionalsPage', () => {
       </MemoryRouter>,
     )
 
-    expect(await screen.findByText('Me Test Vérifié')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /voir le profil/i })).toHaveAttribute(
+    const publishedProfile = (await screen.findByText('Me Test Vérifié')).closest('article')
+    expect(publishedProfile).not.toBeNull()
+    if (!publishedProfile) throw new Error('Le profil publié doit être présenté dans une carte.')
+    expect(within(publishedProfile).getByRole('link', { name: /voir le profil/i })).toHaveAttribute(
       'href',
       '/professionnels/profile-family-001',
     )

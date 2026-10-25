@@ -15,17 +15,49 @@ import {
   Scale,
   ShieldCheck,
   Sparkles,
+  UserRound,
   UsersRound,
 } from 'lucide-react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ProfessionalSearch } from '../components/ProfessionalSearch'
 import { legalCategories } from '../data/catalogue'
+import { getPublishedProfessionals } from '../services/professionalProfiles'
+import type { PublishedProfessional } from '../services/professionalProfiles'
 
 const heroImage = '/images/hero-cabinet.jpg'
 const categoryIcons = [Scale, HeartHandshake, FileText, House, Landmark, BriefcaseBusiness]
 const visibleCategories = legalCategories.slice(0, 6)
+const DraftHomeProfessionalCard = import.meta.env.DEV
+  ? lazy(() =>
+      import('../components/DraftHomeProfessionalCard').then(({ DraftHomeProfessionalCard: card }) => ({
+        default: card,
+      })),
+    )
+  : null
 
 export function HomePage() {
+  const [featuredProfessionals, setFeaturedProfessionals] = useState<PublishedProfessional[]>([])
+  const [professionalLoadError, setProfessionalLoadError] = useState('')
+
+  useEffect(() => {
+    let active = true
+    void getPublishedProfessionals()
+      .then((profiles) => {
+        if (active) setFeaturedProfessionals(profiles.slice(0, 3))
+      })
+      .catch((error: unknown) => {
+        if (active) {
+          setProfessionalLoadError(
+            error instanceof Error ? error.message : 'Les profils professionnels n’ont pas pu être chargés.',
+          )
+        }
+      })
+    return () => {
+      active = false
+    }
+  }, [])
+
   return (
     <>
       <section className="hero">
@@ -136,6 +168,58 @@ export function HomePage() {
               <p>Contactez un professionnel pour organiser la suite adaptée à votre besoin.</p>
             </article>
           </div>
+        </div>
+      </section>
+
+      <section className="section popular-professionals" aria-labelledby="popular-professionals-title">
+        <div className="container">
+          <div className="section-heading">
+            <div>
+              <span className="eyebrow"><span className="eyebrow-line" /> Des profils à découvrir</span>
+              <h2 id="popular-professionals-title">Les experts les plus <em>sollicités.</em></h2>
+            </div>
+            <p>
+              Le classement par sollicitations sera établi à partir des réservations réelles. En attendant,
+              découvrez les profils vérifiés disponibles.
+            </p>
+          </div>
+
+          {professionalLoadError && <p className="popular-professionals__error" role="alert">{professionalLoadError}</p>}
+          {featuredProfessionals.length > 0 || DraftHomeProfessionalCard ? (
+            <div className="popular-professionals__grid">
+              {DraftHomeProfessionalCard && (
+                <Suspense fallback={null}>
+                  <DraftHomeProfessionalCard />
+                </Suspense>
+              )}
+              {featuredProfessionals.map((professional) => (
+                <article className="popular-professional-card" key={professional.id}>
+                  {professional.photoUrl
+                    ? <img src={professional.photoUrl} alt="" />
+                    : <div className="popular-professional-card__avatar" aria-hidden="true"><UserRound size={30} /></div>}
+                  <div className="popular-professional-card__body">
+                    <span className="popular-professional-card__verified"><ShieldCheck size={14} /> Profil vérifié</span>
+                    <h3>{professional.name}</h3>
+                    <p>{professional.profession} · {professional.city}</p>
+                    <div className="popular-professional-card__specialties">
+                      {professional.specialties.slice(0, 3).map((specialty) => <span key={specialty}>{specialty}</span>)}
+                    </div>
+                    <Link to={`/professionnels/${professional.id}`} className="text-link">
+                      Découvrir le profil <ArrowRight size={15} />
+                    </Link>
+                  </div>
+                </article>
+              ))}
+            </div>
+          ) : !professionalLoadError ? (
+            <div className="popular-professionals__empty">
+              <UsersRound size={24} />
+              <p>Aucun profil vérifié n’est publié pour le moment. Les profils apparaîtront ici après validation.</p>
+            </div>
+          ) : null}
+          <Link className="popular-professionals__directory text-link" to="/professionnels">
+            Voir tous les professionnels <ArrowRight size={16} />
+          </Link>
         </div>
       </section>
 

@@ -63,7 +63,7 @@ export function SiteLayout() {
           </div>
           <div className="footer-note" id="confidentialite">
             <span className="eyebrow">Un service en construction</span>
-            <p>Les profils et services seront publiés après vérification. Aucune donnée fictive n’est affichée.</p>
+            <p>Les profils et services seront publiés après vérification. Aucune maquette n’est présentée comme un profil vérifié.</p>
           </div>
         </div>
         <div className="container footer-bottom">
