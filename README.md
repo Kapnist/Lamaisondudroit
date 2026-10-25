@@ -31,6 +31,19 @@ npm run test:watch
 npm run lint
 ```
 
+## Publication sur GitHub Pages
+
+Le dépôt est configuré pour publier automatiquement le site à l’adresse `https://kapnist.github.io/Lamaisondudroit/` après chaque push sur `main`.
+
+1. Dans GitHub, ouvrir **Settings → Pages** et sélectionner **GitHub Actions** comme source de publication.
+2. Vérifier que les actions sont autorisées dans **Settings → Actions → General**.
+3. Envoyer un commit sur `main`, ou lancer manuellement le workflow **Deploy to GitHub Pages** depuis l’onglet **Actions**.
+4. Attendre la réussite des tâches `build` et `deploy`, puis ouvrir l’URL Pages du dépôt.
+
+Le build de production utilise `/Lamaisondudroit/` comme chemin de base et génère un `404.html` pour permettre aux routes React de se recharger directement sur Pages. En développement, Vite continue d’utiliser `/`.
+
+GitHub Pages héberge uniquement les fichiers statiques du frontend. L’authentification, les profils et le stockage Supabase ne seront opérationnels qu’après configuration du projet Supabase et des paramètres/URLs de redirection associés. Aucun secret serveur ne doit être ajouté au workflow ou exposé dans le bundle.
+
 ## Fonctionnalités de cette phase
 
 - Page d'accueil responsive avec l'identité bleu marine/or et l'image fournie sans texte intégré.

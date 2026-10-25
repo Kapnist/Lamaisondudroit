@@ -25,7 +25,7 @@ import { legalCategories } from '../data/catalogue'
 import { getPublishedProfessionals } from '../services/professionalProfiles'
 import type { PublishedProfessional } from '../services/professionalProfiles'
 
-const heroImage = '/images/hero-cabinet.jpg'
+const heroImage = `${import.meta.env.BASE_URL}images/hero-cabinet.jpg`
 const categoryIcons = [Scale, HeartHandshake, FileText, House, Landmark, BriefcaseBusiness]
 const visibleCategories = legalCategories.slice(0, 6)
 const DraftHomeProfessionalCard = import.meta.env.DEV

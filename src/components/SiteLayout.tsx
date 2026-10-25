@@ -32,8 +32,8 @@ export function SiteLayout() {
             <NavLink onClick={closeMenu} to="/professionnels">Trouver un professionnel</NavLink>
             <NavLink onClick={closeMenu} to="/professionnels/inscription">Inscription professionnelle</NavLink>
             <NavLink onClick={closeMenu} to="/professionnel/tableau-de-bord">Tableau de bord</NavLink>
-            <a onClick={closeMenu} href="/#fonctionnement">Comment ça marche</a>
-            <a onClick={closeMenu} href="/#ressources">Conseils & ressources</a>
+            <Link onClick={closeMenu} to="/#fonctionnement">Comment ça marche</Link>
+            <Link onClick={closeMenu} to="/#ressources">Conseils & ressources</Link>
             <Link className="button button--nav" onClick={closeMenu} to="/professionnels/inscription">
               Espace professionnel <ArrowUpRight size={15} />
             </Link>
@@ -52,14 +52,14 @@ export function SiteLayout() {
           <div>
             <h2>Explorer</h2>
             <Link to="/professionnels">Trouver un professionnel</Link>
-            <a href="/#domaines">Domaines juridiques</a>
-            <a href="/#fonctionnement">Comment ça marche</a>
+            <Link to="/#domaines">Domaines juridiques</Link>
+            <Link to="/#fonctionnement">Comment ça marche</Link>
           </div>
           <div>
             <h2>La plateforme</h2>
             <Link to="/professionnels/inscription">Inscription professionnelle</Link>
-            <a href="/#ressources">Conseils & ressources</a>
-            <a href="/#confidentialite">Confidentialité</a>
+            <Link to="/#ressources">Conseils & ressources</Link>
+            <Link to="/#confidentialite">Confidentialité</Link>
           </div>
           <div className="footer-note" id="confidentialite">
             <span className="eyebrow">Un service en construction</span>

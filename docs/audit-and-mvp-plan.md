@@ -29,6 +29,7 @@ Aucune fonctionnalité applicative ni donnée professionnelle vérifiée n'étai
 - Parcours public d'accueil et annuaire prêt à recevoir des profils publiés et vérifiés.
 - Aucune donnée professionnelle de démonstration n'est affichée comme réelle.
 - Les recherches et filtres côté interface sont préparés, mais le catalogue reste vide en attendant une source de données serveur.
+- Workflow `.github/workflows/deploy-pages.yml` pour le build et le déploiement GitHub Pages, avec base URL `/Lamaisondudroit/` et fallback `404.html` pour React Router. La source Pages doit être sélectionnée sur GitHub via **Settings → Pages → GitHub Actions**.
 - Documentation de prise en main, architecture, limites, décisions et consignes de passation dans `README.md`.
 
 ### Cible technique à confirmer avant les espaces authentifiés
