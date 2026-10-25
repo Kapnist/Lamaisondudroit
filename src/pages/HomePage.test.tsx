@@ -13,6 +13,7 @@ describe('HomePage', () => {
 
     expect(screen.getByRole('heading', { name: /vos droits méritent les bons alliés/i })).toBeInTheDocument()
     expect(screen.getAllByRole('link', { name: /trouver un professionnel/i }).length).toBeGreaterThan(0)
+    expect(screen.getByRole('link', { name: /explorer l’annuaire/i })).toHaveAttribute('href', '/professionnels')
     expect(screen.queryByText('Me Amina Exemple')).not.toBeInTheDocument()
   })
 })

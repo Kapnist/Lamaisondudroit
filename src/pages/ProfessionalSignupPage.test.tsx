@@ -35,7 +35,7 @@ describe('ProfessionalSignupPage', () => {
       '/professionnels?q=Droit%20de%20la%20famille',
     )
 
-    const saved = JSON.parse(sessionStorage.getItem(developmentRegistrationsStorageKey) ?? '[]')
+    const saved = JSON.parse(localStorage.getItem(developmentRegistrationsStorageKey) ?? '[]')
     expect(saved).toHaveLength(1)
     expect(saved[0].categories).toEqual(['Droit de la famille', 'Droit du travail'])
     expect(saved[0].reviewStatus).toBe('pending_verification')

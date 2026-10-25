@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import { cities, filterProfessionals, type Professional } from './catalogue'
+import {
+  cities,
+  cityRegions,
+  filterProfessionals,
+  regions,
+  type Professional,
+} from './catalogue'
 
 const verifiedLawyer: Professional = {
   id: 'verified-1',
@@ -21,6 +27,15 @@ describe('filterProfessionals', () => {
   it('includes Bangangté and Bamena as searchable cities', () => {
     expect(cities).toContain('Bangangté')
     expect(cities).toContain('Bamena')
+    expect(cityRegions.Bangangté).toBe('Ouest')
+    expect(cityRegions.Bamena).toBe('Ouest')
+  })
+
+  it('provides all ten Cameroon regions', () => {
+    expect(regions).toHaveLength(10)
+    expect(regions).toContain('Extrême-Nord')
+    expect(regions).toContain('Nord-Ouest')
+    expect(regions).toContain('Sud-Ouest')
   })
 
   it('filters by case-insensitive name, city, and profession', () => {
@@ -29,6 +44,11 @@ describe('filterProfessionals', () => {
 
   it('matches a legal specialty', () => {
     expect(filterProfessionals([verifiedLawyer], 'travail', '', '')).toEqual([verifiedLawyer])
+  })
+
+  it('filters verified profiles by their Cameroon region', () => {
+    expect(filterProfessionals([verifiedLawyer], '', '', '', 'Littoral')).toEqual([verifiedLawyer])
+    expect(filterProfessionals([verifiedLawyer], '', '', '', 'Ouest')).toEqual([])
   })
 
   it('never returns a profile that has not been verified', () => {

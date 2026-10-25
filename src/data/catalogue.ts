@@ -21,6 +21,32 @@ export const legalCategories = [
 
 export const cities = ['Douala', 'Yaoundé', 'Bafoussam', 'Garoua', 'Bangangté', 'Bamena'] as const
 export const professions = ['Avocat', 'Notaire', 'Juriste'] as const
+export const regions = [
+  'Adamaoua',
+  'Centre',
+  'Est',
+  'Extrême-Nord',
+  'Littoral',
+  'Nord',
+  'Nord-Ouest',
+  'Ouest',
+  'Sud',
+  'Sud-Ouest',
+] as const
+
+export const cityRegions: Record<(typeof cities)[number], (typeof regions)[number]> = {
+  Douala: 'Littoral',
+  Yaoundé: 'Centre',
+  Bafoussam: 'Ouest',
+  Garoua: 'Nord',
+  Bangangté: 'Ouest',
+  Bamena: 'Ouest',
+}
+
+export function getRegionForCity(city: string): (typeof regions)[number] | undefined {
+  const matchingCity = cities.find((item) => item === city)
+  return matchingCity ? cityRegions[matchingCity] : undefined
+}
 
 export type Professional = {
   id: string
@@ -39,6 +65,7 @@ export function filterProfessionals(
   query: string,
   city: string,
   profession: string,
+  region = '',
 ): Professional[] {
   const normalizedQuery = query.trim().toLocaleLowerCase('fr')
 
@@ -59,6 +86,7 @@ export function filterProfessionals(
       professional.verified &&
       matchesQuery &&
       (!city || professional.city === city) &&
+      (!region || cityRegions[professional.city] === region) &&
       (!profession || professional.profession === profession)
     )
   })

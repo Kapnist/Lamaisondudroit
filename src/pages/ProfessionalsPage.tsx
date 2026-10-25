@@ -2,7 +2,7 @@ import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
 import { ArrowRight, BriefcaseBusiness, MapPin, Search, ShieldCheck, SlidersHorizontal, UsersRound } from 'lucide-react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { cities, filterProfessionals, professions, professionals } from '../data/catalogue'
+import { cities, filterProfessionals, professions, professionals, regions } from '../data/catalogue'
 import { ProfessionalSearch } from '../components/ProfessionalSearch'
 
 const DraftDirectoryPreview = import.meta.env.DEV
@@ -26,24 +26,28 @@ export function ProfessionalsPage() {
   const [query, setQuery] = useState(searchParams.get('q') ?? '')
   const [city, setCity] = useState(searchParams.get('ville') ?? '')
   const [profession, setProfession] = useState(searchParams.get('profession') ?? '')
+  const [region, setRegion] = useState(searchParams.get('region') ?? '')
 
   useEffect(() => {
     setQuery(searchParams.get('q') ?? '')
     setCity(searchParams.get('ville') ?? '')
     setProfession(searchParams.get('profession') ?? '')
+    setRegion(searchParams.get('region') ?? '')
   }, [searchParams])
 
   const results = useMemo(
-    () => filterProfessionals(professionals, query, city, profession),
-    [query, city, profession],
+    () => filterProfessionals(professionals, query, city, profession, region),
+    [query, city, profession, region],
   )
   const appliedQuery = searchParams.get('q') ?? ''
   const appliedCity = searchParams.get('ville') ?? ''
   const appliedProfession = searchParams.get('profession') ?? ''
+  const appliedRegion = searchParams.get('region') ?? ''
   const isDraftProfileSearch =
     import.meta.env.DEV &&
     Boolean(DraftDirectoryPreview) &&
     !appliedCity &&
+    !appliedRegion &&
     (!appliedProfession || appliedProfession === 'Avocat') &&
     /famille|noupa|rudi/i.test(appliedQuery)
   const hasDevelopmentRegistrations = Boolean(DevelopmentRegistrations && import.meta.env.DEV)
@@ -54,6 +58,7 @@ export function ProfessionalsPage() {
     if (query.trim()) next.set('q', query.trim())
     if (city) next.set('ville', city)
     if (profession) next.set('profession', profession)
+    if (region) next.set('region', region)
     setSearchParams(next)
   }
 
@@ -61,6 +66,7 @@ export function ProfessionalsPage() {
     setQuery('')
     setCity('')
     setProfession('')
+    setRegion('')
     setSearchParams({})
   }
 
@@ -95,6 +101,11 @@ export function ProfessionalsPage() {
                 <option value="">Toutes les villes</option>
                 {cities.map((item) => <option key={item}>{item}</option>)}
               </select>
+              <label className="filter-label" htmlFor="directory-region">Région</label>
+              <select id="directory-region" className="filter-select" value={region} onChange={(event) => setRegion(event.target.value)}>
+                <option value="">Toutes les régions</option>
+                {regions.map((item) => <option key={item}>{item}</option>)}
+              </select>
               <button className="button button--nav filter-submit" type="submit">Appliquer les filtres <ArrowRight size={16} /></button>
               <button className="clear-filters" type="button" onClick={clearFilters}>Effacer les filtres</button>
             </form>
@@ -103,7 +114,9 @@ export function ProfessionalsPage() {
           <div className="directory-results" aria-live="polite">
             <div className="results-heading">
               <div><span className="eyebrow">L’annuaire</span><h2>Professionnels du droit</h2></div>
-              <span className="results-count">{results.length} profil{results.length > 1 ? 's' : ''}</span>
+              <span className="results-count">
+                {results.length} profil{results.length === 1 ? '' : 's'} vérifié{results.length === 1 ? '' : 's'}
+              </span>
             </div>
             {results.length === 0 ? (
               <div className="empty-state">
@@ -113,7 +126,7 @@ export function ProfessionalsPage() {
                 <p>
                   Les profils apparaîtront ici après vérification. Nous préférons attendre les premiers professionnels validés plutôt que d’afficher des profils fictifs.
                 </p>
-                {(query || city || profession) && <button className="text-link" type="button" onClick={clearFilters}>Effacer la recherche <ArrowRight size={15} /></button>}
+                {(query || city || profession || region) && <button className="text-link" type="button" onClick={clearFilters}>Effacer la recherche <ArrowRight size={15} /></button>}
               </div>
             ) : (
               <div className="professional-list">
@@ -137,7 +150,7 @@ export function ProfessionalsPage() {
             )}
             {hasDevelopmentRegistrations && DevelopmentRegistrations && (
               <Suspense fallback={null}>
-                <DevelopmentRegistrations query={appliedQuery} city={appliedCity} profession={appliedProfession} />
+                <DevelopmentRegistrations query={appliedQuery} city={appliedCity} profession={appliedProfession} region={appliedRegion} />
               </Suspense>
             )}
             <div className="directory-disclaimer"><MapPin size={15} /><span>La présence dans un domaine ne constitue pas une garantie de compétence juridique.</span></div>

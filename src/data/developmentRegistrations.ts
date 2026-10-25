@@ -22,14 +22,21 @@ export function saveDevelopmentRegistration(
     reviewStatus: 'pending_verification',
   }
   const registrations = getDevelopmentRegistrations()
-  sessionStorage.setItem(storageKey, JSON.stringify([...registrations, registration]))
+  localStorage.setItem(storageKey, JSON.stringify([...registrations, registration]))
   return registration
 }
 
 export function getDevelopmentRegistrations(): DevelopmentRegistration[] {
   if (!import.meta.env.DEV) return []
 
-  const stored = sessionStorage.getItem(storageKey)
+  let stored = localStorage.getItem(storageKey)
+  if (!stored) {
+    stored = sessionStorage.getItem(storageKey)
+    if (stored) {
+      localStorage.setItem(storageKey, stored)
+      sessionStorage.removeItem(storageKey)
+    }
+  }
   if (!stored) return []
 
   let parsed: unknown
@@ -67,6 +74,7 @@ export function getDevelopmentRegistrations(): DevelopmentRegistration[] {
 
 export function clearDevelopmentRegistrations(): void {
   if (import.meta.env.DEV) {
+    localStorage.removeItem(storageKey)
     sessionStorage.removeItem(storageKey)
   }
 }

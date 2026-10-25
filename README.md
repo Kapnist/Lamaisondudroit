@@ -45,7 +45,8 @@ npm run lint
 - Visuel de bannière optimisé en JPEG (environ 197 Ko) à partir du PNG fourni, dont l'original reste conservé.
 - Fiche locale de démonstration pour Maître Noupa Rudi, non publiée et non vérifiée, avec texte de présentation proposé, accessible uniquement avec le serveur de développement à `/__dev/professionnels/maitre-noupa-rudi`.
 - Formulaire de préparation à l’inscription professionnelle avec sélection d’une ou plusieurs catégories juridiques.
-- En mode développement, les candidatures de démonstration sont conservées dans la session de l’onglet et apparaissent dans l’annuaire en tant que profils en attente de vérification; cette liste est exclue de la production.
+- En mode développement, les candidatures de démonstration sont conservées dans le navigateur et apparaissent dans l’annuaire en tant que profils en attente de vérification. Elles sont partagées entre les onglets de ce navigateur, mais pas avec d’autres appareils ou utilisateurs et sont exclues de la production.
+- L’annuaire présente les dix régions du Cameroun comme filtres. Le formulaire de candidature associe la région aux villes connues : Bangangté, Bamena et Bafoussam (Ouest), Douala (Littoral), Yaoundé (Centre) et Garoua (Nord).
 - Menu de partage sur la fiche de profil avec options WhatsApp, Facebook, Instagram (copie du lien puis ouverture) et copie directe.
 
 ## Organisation du code
@@ -73,7 +74,7 @@ docs/
 - `src/data/catalogue.ts` centralise les catégories, villes, professions et fonction `filterProfessionals`.
 - `professionals` est volontairement vide tant qu'aucune source serveur ne fournit de profils vérifiés. Brancher le backend à cette frontière plutôt que d'ajouter des profils fictifs.
 - La fiche de démonstration est séparée du catalogue dans `src/data/draftProfiles.ts`; sa route existe uniquement quand `import.meta.env.DEV` est vrai. Son portrait reste sous `src/assets/` et est retiré du build de production avec cette route. Elle ne doit pas être utilisée comme preuve d'identité ni publiée sans consentement sur l'image et validation des justificatifs.
-- Le formulaire `/professionnels/inscription` permet de préparer une candidature avec plusieurs catégories. En développement seulement, les entrées sont conservées temporairement dans la session de l'onglet pour tester leur affichage dans l'annuaire. Ce n'est ni une inscription serveur ni un stockage adapté à de vraies données.
+- Le formulaire `/professionnels/inscription` permet de préparer une candidature avec plusieurs catégories. En développement seulement, les entrées sont conservées en `localStorage` pour que l'annuaire les affiche depuis les autres onglets du même navigateur, avec leur statut « en attente ». Ce n'est ni une inscription serveur ni un stockage adapté à de vraies données.
 - `ShareProfileButton` ouvre des options explicites : WhatsApp et Facebook préremplissent le partage; Instagram ne proposant pas de lien web standard pour partager une page, l'option copie l'URL puis ouvre Instagram; la copie directe reste disponible. Les liens des brouillons locaux ne sont pas accessibles au public; le bouton le signale.
 - En mode développement, une recherche correspondant à « famille », « Noupa » ou « Rudi » affiche une carte de prévisualisation clairement séparée des profils publiés; elle renvoie vers la fiche de démonstration. Cette carte et ses données sont absentes de production.
 - Le texte de présentation du brouillon est lui aussi à valider avant publication, notamment les descriptions de démarches juridiques et de protection. Il est formulé sans garantir un résultat ou une mesure spécifique.

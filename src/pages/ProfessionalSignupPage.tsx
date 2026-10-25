@@ -2,7 +2,7 @@ import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { ArrowRight, BriefcaseBusiness, ShieldAlert } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { cities, legalCategories, professions } from '../data/catalogue'
+import { cities, getRegionForCity, legalCategories, professions } from '../data/catalogue'
 import { saveDevelopmentRegistration } from '../data/developmentRegistrations'
 
 type SignupPreview = {
@@ -73,7 +73,7 @@ export function ProfessionalSignupPage() {
 
         <div className="signup-notice" role="note">
           <ShieldAlert size={19} />
-          <p>Formulaire de préparation : vos choix sont conservés temporairement dans cette session de développement pour tester leur affichage. Ils ne sont pas envoyés au serveur. L’inscription réelle nécessitera un backend et une vérification professionnelle.</p>
+          <p>Formulaire de préparation : vos choix sont conservés dans ce navigateur de développement pour tester leur affichage dans l’annuaire. Ils ne sont pas envoyés au serveur et ne sont visibles que sur cet appareil. Une inscription partagée entre utilisateurs nécessitera un backend et une vérification professionnelle.</p>
         </div>
 
         <form className="signup-form" onSubmit={handleSubmit}>
@@ -100,7 +100,7 @@ export function ProfessionalSignupPage() {
               <span>Ville d’exercice <b aria-hidden="true">*</b></span>
               <select id="signup-city" name="city" defaultValue="" required>
                 <option value="" disabled>Choisir une ville</option>
-                {cities.map((city) => <option key={city} value={city}>{city}</option>)}
+                {cities.map((city) => <option key={city} value={city}>{city} — région {getRegionForCity(city)}</option>)}
               </select>
             </label>
 
@@ -141,7 +141,7 @@ export function ProfessionalSignupPage() {
             <ul className="signup-preview__categories">
               {preview.categories.map((category) => <li key={category}>{category}</li>)}
             </ul>
-            <strong>Enregistré uniquement dans cette session de développement; profil en attente de vérification.</strong>
+            <strong>Enregistré dans ce navigateur de développement; profil en attente de vérification.</strong>
             <Link className="button button--nav signup-preview__link" to={`/professionnels?q=${encodeURIComponent(preview.categories[0] ?? '')}`}>
               Voir dans l’annuaire de démonstration <ArrowRight size={15} />
             </Link>
@@ -149,7 +149,7 @@ export function ProfessionalSignupPage() {
         )}
 
         <p className="signup-footnote">
-          En développement, les aperçus de candidature sont conservés dans la session du navigateur. En production, une inscription devra être transmise au serveur puis vérifiée avant toute publication.
+          En développement, les aperçus sont conservés dans ce navigateur et accessibles depuis l’annuaire. En production, les profils devront être transmis au serveur et leur statut contrôlé avant publication.
         </p>
       </div>
     </section>

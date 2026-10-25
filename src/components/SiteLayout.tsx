@@ -67,7 +67,7 @@ export function SiteLayout() {
         </div>
         <div className="container footer-bottom">
           <span>© {new Date().getFullYear()} La Maison du Droit</span>
-          <span>Conçu avec soin au Cameroun <span aria-hidden="true">🇨🇲</span></span>
+          <span>Vous n’êtes plus seul.</span>
         </div>
       </footer>
     </>

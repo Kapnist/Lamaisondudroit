@@ -1,8 +1,10 @@
-import { render, screen, waitFor, within } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { beforeEach, describe, expect, it } from 'vitest'
+import { DevelopmentRegistrations } from '../components/DevelopmentRegistrations'
 import {
   clearDevelopmentRegistrations,
+  developmentRegistrationsStorageKey,
   saveDevelopmentRegistration,
 } from '../data/developmentRegistrations'
 import { ProfessionalsPage } from './ProfessionalsPage'
@@ -72,9 +74,57 @@ describe('ProfessionalsPage', () => {
       </MemoryRouter>,
     )
 
-    expect(await screen.findByRole('heading', { name: /candidatures de cette session/i })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: /profils inscrits — prévisualisation locale/i })).toBeInTheDocument()
     expect(screen.getByText('Maître Essai')).toBeInTheDocument()
     expect(screen.getByText('Me Test')).toBeInTheDocument()
     expect(screen.getAllByText('En attente de vérification')).toHaveLength(2)
+    expect(screen.getByText(/Bamena, région Ouest/)).toBeInTheDocument()
+    expect(screen.getByText(/Bangangté, région Ouest/)).toBeInTheDocument()
+  })
+
+  it('filters registered profiles by region', async () => {
+    saveDevelopmentRegistration({
+      name: 'Avocate Ouest',
+      profession: 'Avocat',
+      city: 'Bafoussam',
+      categories: ['Droit de la famille'],
+    })
+    saveDevelopmentRegistration({
+      name: 'Avocat Littoral',
+      profession: 'Avocat',
+      city: 'Douala',
+      categories: ['Droit du travail'],
+    })
+
+    render(
+      <MemoryRouter initialEntries={['/professionnels?region=Ouest']}>
+        <ProfessionalsPage />
+      </MemoryRouter>,
+    )
+
+    expect(await screen.findByText('Avocate Ouest')).toBeInTheDocument()
+    expect(screen.queryByText('Avocat Littoral')).not.toBeInTheDocument()
+    expect(screen.getByLabelText('Région')).toHaveValue('Ouest')
+  })
+
+  it('refreshes the directory when another tab registers a profile', async () => {
+    render(
+      <DevelopmentRegistrations query="" city="" profession="" region="" />,
+    )
+
+    localStorage.setItem(
+      developmentRegistrationsStorageKey,
+      JSON.stringify([{
+        id: 'other-tab-profile',
+        name: 'Profil ajouté ailleurs',
+        profession: 'Avocat',
+        city: 'Douala',
+        categories: ['Droit de la famille'],
+        reviewStatus: 'pending_verification',
+      }]),
+    )
+    fireEvent(window, new StorageEvent('storage', { key: developmentRegistrationsStorageKey }))
+
+    expect(await screen.findByText('Profil ajouté ailleurs')).toBeInTheDocument()
   })
 })

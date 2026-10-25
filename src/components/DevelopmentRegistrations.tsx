@@ -1,21 +1,40 @@
 import { Clock3, ShieldAlert } from 'lucide-react'
-import { useMemo } from 'react'
-import { getDevelopmentRegistrations } from '../data/developmentRegistrations'
+import { useEffect, useMemo, useState } from 'react'
+import {
+  developmentRegistrationsStorageKey,
+  getDevelopmentRegistrations,
+} from '../data/developmentRegistrations'
+import { getRegionForCity } from '../data/catalogue'
 
 type DevelopmentRegistrationsProps = {
   query: string
   city: string
   profession: string
+  region: string
 }
 
 export function DevelopmentRegistrations({
   query,
   city,
   profession,
+  region,
 }: DevelopmentRegistrationsProps) {
+  const [allRegistrations, setAllRegistrations] = useState(getDevelopmentRegistrations)
+
+  useEffect(() => {
+    function refreshRegistrations(event: StorageEvent) {
+      if (event.key === developmentRegistrationsStorageKey || event.key === null) {
+        setAllRegistrations(getDevelopmentRegistrations())
+      }
+    }
+
+    window.addEventListener('storage', refreshRegistrations)
+    return () => window.removeEventListener('storage', refreshRegistrations)
+  }, [])
+
   const registrations = useMemo(() => {
     const normalizedQuery = query.trim().toLocaleLowerCase('fr')
-    return getDevelopmentRegistrations().filter((registration) => {
+    return allRegistrations.filter((registration) => {
       const matchesQuery =
         !normalizedQuery ||
         [
@@ -31,10 +50,11 @@ export function DevelopmentRegistrations({
       return (
         matchesQuery &&
         (!city || registration.city === city) &&
+        (!region || getRegionForCity(registration.city) === region) &&
         (!profession || registration.profession === profession)
       )
     })
-  }, [query, city, profession])
+  }, [allRegistrations, query, city, profession, region])
 
   if (registrations.length === 0) return null
 
@@ -43,8 +63,8 @@ export function DevelopmentRegistrations({
       <div className="development-registrations__heading">
         <ShieldAlert size={17} />
         <div>
-          <h3 id="development-registrations-title">Candidatures de cette session — prévisualisation locale</h3>
-          <p>Ces profils ne sont pas publiés ni vérifiés. Ils ne sont visibles que dans ce navigateur de développement.</p>
+          <h3 id="development-registrations-title">Profils inscrits — prévisualisation locale</h3>
+          <p>Ces candidatures ne sont pas vérifiées. Elles sont enregistrées dans ce navigateur de développement et visibles dans l’annuaire avec leur statut.</p>
         </div>
       </div>
       <div className="development-registrations__list">
@@ -55,7 +75,7 @@ export function DevelopmentRegistrations({
             </div>
             <div className="development-registration-card__details">
               <strong>{registration.name}</strong>
-              <span>{registration.profession} · {registration.city}</span>
+              <span>{registration.profession} · {registration.city}{getRegionForCity(registration.city) ? `, région ${getRegionForCity(registration.city)}` : ''}</span>
               <span>{registration.categories.join(' · ')}</span>
             </div>
             <div className="development-registration-card__status">
