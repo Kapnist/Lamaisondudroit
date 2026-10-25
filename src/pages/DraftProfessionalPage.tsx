@@ -17,8 +17,8 @@ export function DraftProfessionalPage() {
         <div className="draft-warning" role="status">
           <ShieldAlert size={20} />
           <div>
-            <strong>Maquette — profil non vérifié</strong>
-            <p>Cette fiche est visible uniquement en développement. Les justificatifs n’ont pas été contrôlés et le profil ne peut pas proposer de consultations.</p>
+            <strong>Profil fictif de démonstration — ne représente pas un professionnel réel</strong>
+            <p>Cette fiche est un exemple d’interface. L’identité, les justificatifs et les informations professionnelles ne sont pas vérifiés. Aucune consultation ne peut être réservée.</p>
           </div>
         </div>
 

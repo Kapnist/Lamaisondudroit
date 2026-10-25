@@ -24,7 +24,7 @@ describe('HomePage', () => {
     expect(within(draftCard).getByRole('img', { name: /maquette du profil de maître noupa rudi/i })).toBeInTheDocument()
     expect(within(draftCard).getByRole('link', { name: /voir le profil/i })).toHaveAttribute(
       'href',
-      '/__dev/professionnels/maitre-noupa-rudi',
+      '/professionnels/demo/maitre-noupa-rudi',
     )
     expect(screen.queryByText('Me Amina Exemple')).not.toBeInTheDocument()
   })

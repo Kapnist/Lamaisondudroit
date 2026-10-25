@@ -37,13 +37,38 @@ describe('ProfessionalsPage', () => {
       </MemoryRouter>,
     )
 
-    expect(await screen.findByRole('heading', { name: /aperçu de développement — vérification à confirmer/i })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: /profil fictif de démonstration — non vérifié/i })).toBeInTheDocument()
     expect(screen.getByText('Maître Noupa Rudi')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Voir le profil' })).toHaveAttribute(
       'href',
-      '/__dev/professionnels/maitre-noupa-rudi',
+      '/professionnels/demo/maitre-noupa-rudi',
     )
     expect(screen.getByRole('img', { name: /maquette du profil de maître noupa rudi/i })).toBeInTheDocument()
+  })
+
+  it.each(['avocat', 'divorce'])('shows the draft profile for a related search: %s', async (query) => {
+    vi.spyOn(professionalProfiles, 'getPublishedProfessionals').mockResolvedValueOnce([])
+    render(
+      <MemoryRouter initialEntries={[`/professionnels?q=${encodeURIComponent(query)}`]}>
+        <ProfessionalsPage />
+      </MemoryRouter>,
+    )
+
+    expect(await screen.findByRole('heading', { name: /profil fictif de démonstration — non vérifié/i })).toBeInTheDocument()
+    expect(screen.getByText('Maître Noupa Rudi')).toBeInTheDocument()
+  })
+
+  it('does not show the draft profile for an unrelated specialty search', async () => {
+    vi.spyOn(professionalProfiles, 'getPublishedProfessionals').mockResolvedValueOnce([])
+    render(
+      <MemoryRouter initialEntries={['/professionnels?q=droit%20p%C3%A9nal']}>
+        <ProfessionalsPage />
+      </MemoryRouter>,
+    )
+
+    await waitFor(() => {
+      expect(screen.queryByRole('heading', { name: /profil fictif de démonstration/i })).not.toBeInTheDocument()
+    })
   })
 
   it('shows the clearly unverified Maître Rudi example on an unfiltered directory visit in development', async () => {
@@ -54,13 +79,13 @@ describe('ProfessionalsPage', () => {
       </MemoryRouter>,
     )
 
-    expect(await screen.findByRole('heading', { name: /aperçu de développement — vérification à confirmer/i })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: /profil fictif de démonstration — non vérifié/i })).toBeInTheDocument()
     expect(screen.getByText('Maître Noupa Rudi')).toBeInTheDocument()
     expect(screen.getByText('Avocat · Droit de la famille')).toBeInTheDocument()
-    expect(screen.getByText('Vérification à confirmer')).toBeInTheDocument()
+    expect(screen.getByText('Profil fictif · non vérifié')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Voir le profil' })).toHaveAttribute(
       'href',
-      '/__dev/professionnels/maitre-noupa-rudi',
+      '/professionnels/demo/maitre-noupa-rudi',
     )
   })
 
@@ -73,7 +98,7 @@ describe('ProfessionalsPage', () => {
     )
 
     await waitFor(() => {
-      expect(screen.queryByRole('heading', { name: /aperçu de développement/i })).not.toBeInTheDocument()
+      expect(screen.queryByRole('heading', { name: /profil fictif de démonstration/i })).not.toBeInTheDocument()
     })
   })
 

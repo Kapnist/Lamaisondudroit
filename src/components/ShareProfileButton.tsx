@@ -68,7 +68,7 @@ export function ShareProfileButton({ name, description, isDraft = false }: Share
         </div>
       )}
       {status && <p className="share-profile__status" role="status">{status}</p>}
-      {isDraft && <p className="share-profile__notice">Cette adresse de prévisualisation est locale et n’est pas accessible au public.</p>}
+      {isDraft && <p className="share-profile__notice">Cette fiche de démonstration est publique, mais ne représente pas un professionnel réel.</p>}
     </div>
   )
 }

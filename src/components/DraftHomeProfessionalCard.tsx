@@ -13,7 +13,7 @@ export function DraftHomeProfessionalCard() {
         <div className="popular-professional-card__specialties">
           <span>{noupaRudiDraft.specialty}</span>
         </div>
-        <Link to="/__dev/professionnels/maitre-noupa-rudi" className="text-link">
+        <Link to="/professionnels/demo/maitre-noupa-rudi" className="text-link">
           Voir le profil <ArrowRight size={15} />
         </Link>
       </div>

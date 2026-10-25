@@ -7,13 +7,11 @@ import { ProfessionalSearch } from '../components/ProfessionalSearch'
 import { getPublishedProfessionals } from '../services/professionalProfiles'
 import type { PublishedProfessional } from '../services/professionalProfiles'
 
-const DraftDirectoryPreview = import.meta.env.DEV
-  ? lazy(() =>
-      import('../components/DraftDirectoryPreview').then(({ DraftDirectoryPreview: preview }) => ({
-        default: preview,
-      })),
-    )
-  : null
+const DraftDirectoryPreview = lazy(() =>
+  import('../components/DraftDirectoryPreview').then(({ DraftDirectoryPreview: preview }) => ({
+    default: preview,
+  })),
+)
 
 const DevelopmentRegistrations = import.meta.env.DEV
   ? lazy(() =>
@@ -22,6 +20,33 @@ const DevelopmentRegistrations = import.meta.env.DEV
       })),
     )
   : null
+
+function normalizeSearchText(value: string) {
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+}
+
+function matchesDraftProfileSearch(query: string) {
+  if (!query.trim()) return true
+
+  const searchableText = normalizeSearchText([
+    'Maître Noupa Rudi',
+    'Avocat',
+    'Droit de la famille',
+    'Violences conjugales',
+    'Violences familiales',
+    'Protection des enfants',
+    'Divorce',
+    'Séparations',
+    'Litiges familiaux',
+    'Premier entretien',
+  ].join(' '))
+  const queryWords = normalizeSearchText(query).split(/[^a-z0-9]+/).filter(Boolean)
+
+  return queryWords.every((word) => searchableText.includes(word))
+}
 
 export function ProfessionalsPage() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -66,12 +91,10 @@ export function ProfessionalsPage() {
   const appliedProfession = searchParams.get('profession') ?? ''
   const appliedRegion = searchParams.get('region') ?? ''
   const isDraftProfileSearch =
-    import.meta.env.DEV &&
-    Boolean(DraftDirectoryPreview) &&
     !appliedCity &&
     !appliedRegion &&
     (!appliedProfession || appliedProfession === 'Avocat') &&
-    (!appliedQuery || /famille|noupa|rudi/i.test(appliedQuery))
+    matchesDraftProfileSearch(appliedQuery)
   const hasDevelopmentRegistrations = Boolean(DevelopmentRegistrations && import.meta.env.DEV)
 
   function applyFilters(event: FormEvent<HTMLFormElement>) {
@@ -171,7 +194,7 @@ export function ProfessionalsPage() {
                 ))}
               </div>
             )}
-            {isDraftProfileSearch && DraftDirectoryPreview && (
+            {isDraftProfileSearch && (
               <Suspense fallback={null}>
                 <DraftDirectoryPreview />
               </Suspense>
